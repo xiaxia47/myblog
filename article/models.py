@@ -28,5 +28,5 @@ class Article(models.Model):
 class Comment(models.Model):
     article = models.ForeignKey(Article)
     create_date = models.DateTimeField(auto_now_add=True) #发布评论时间
-    content = models.TextField(blank=True) #  
+    content = models.TextField(blank=True) # Comments
     
