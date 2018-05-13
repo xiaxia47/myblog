@@ -7,6 +7,10 @@ from datetime import datetime
 
 # Create your views here.
 
+def index(request):
+    article_list = Article.objects.all().order_by('-pub_date')
+    return render(request,'article/index.html',context={'post_list':article_list})
+
 def home(request):
     post_list = Article.objects.all()
     paginator = Paginator(post_list,2)

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'article.templatetags.custom_markdown',
     'article.apps.ArticleConfig',
+    'comment.apps.CommentConfig',
 ]
 
 MIDDLEWARE = [
@@ -118,9 +119,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-
+#STATIC_ROOT = ''   # for production env only
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),
+               ]
 #CSRF_COOKIE_SECURE = True
 #X_FRAME_OPTIONS = 'DENY'
 #SESSION_COOKIE_SECURE = True
