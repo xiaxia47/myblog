@@ -5,7 +5,7 @@ from .models import Article, Tag, Category
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title','category','pub_date')
+    list_display = ('title','author','category','modyfied_date','pub_date')
     fieldsets = [
         (None,{'fields':['title']}),
         ('类别',{'fields':['category','tag']}),

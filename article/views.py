@@ -4,6 +4,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
 from datetime import datetime
+import markdown
 
 # Create your views here.
 
@@ -28,6 +29,12 @@ def home(request):
 
 def detail(request, article_id):
     post = get_object_or_404(Article, pk=article_id)
+    post.content = markdown.markdown(post.content, 
+                            extensions=[
+                                'markdown.extensions.extra',
+                                'markdown.extensions.codehilite',  #语法高亮
+                                'markdown.extensions.toc',       #自动生成目录
+                            ])
     return render(request, 'article/detail.html',{'post': post})
 
 def test(request):
