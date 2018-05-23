@@ -8,7 +8,7 @@ from .forms import CommentForm
 # Create your views here.
 def post_comment(request, article_pk):
     article = get_object_or_404(Article,pk=article_pk)
-    if request.method == 'POST':
+    if request.method = 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
@@ -23,4 +23,3 @@ def post_comment(request, article_pk):
             return render(request,'article/Article',
                           context=context)
     return redirect(post)
-

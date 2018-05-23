@@ -73,6 +73,7 @@ db.sqlite3
 article/migrations/*.*
 *.conf
 *.ini
+*.swp
 
 =======
 >>>>>>> e35385782fa6057924265062c00c4ebed35a0926

@@ -1,15 +1,16 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
-from .models import Article
+from .models import Article,Category
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
 from datetime import datetime
+from comment.forms import CommentForm
 import markdown
 
 # Create your views here.
 
 def index(request):
-    article_list = Article.objects.all().order_by('-pub_date')
+    article_list = Article.objects.all()
     return render(request,'article/index.html',context={'post_list':article_list})
 
 def home(request):
@@ -35,21 +36,20 @@ def detail(request, article_id):
                                 'markdown.extensions.codehilite',  #语法高亮
                                 'markdown.extensions.toc',       #自动生成目录
                             ])
-    return render(request, 'article/detail.html',{'post': post})
+    form = CommentForm()
+    comment_list = post.comment_set.all()
+    context = {'post': post,
+               'form': form,
+               'comment_list': comment_list
+              }
+   
+    return render(request, 'article/detail.html',context=context)
 
-def test(request):
-    
-    post_list = Article.objects.all()
-    return render(request,'article/home.html',{'post_list': post_list})
-
-def archives(request):
-    try:
-        post_list = Article.objects.all()
-    except Article.DoesNotExist:
-        raise Http404
-    else:
-        return render(request,'article/archives.html',
-                      {'post_list': post_list,'error': False}) 
+def archives(request, year, month):
+    post_list = Article.objects.filter(pub_date__year=year,
+                                       pub_date__month=month
+                                       )
+    return render(request,'article/index.html',{'post_list': post_list}) 
 
 def search(request,category=None):
     result = {'error':False,'msg':None}
@@ -64,7 +64,11 @@ def search(request,category=None):
     return render(request, 'article/search.html',
                   {'post_list': post_list,'result': result})
 
-
-
 def about(request):
     return render(request,'article/aboutme.html')
+
+def category(request, category_id):
+    cate = get_object_or_404(Category, pk=category_id)
+    post_list = Article.objects.filter(category=cate)
+    return render(request, 'article/index.html', context={'post_list': post_list})
+    
