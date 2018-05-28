@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'haystack',
     'article.templatetags.custom_markdown',
     'article.apps.ArticleConfig',
     'comment.apps.CommentConfig',
@@ -120,6 +121,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+HAYSTACK_CONNECTIONS = {
+    'default':{
+        'ENGINE': 'article.whoosh_cn_backend.WhooshEngine',
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    },
+}
+HAYSTACK_SEARCH_RESULTS_PRE_PAGE = 5
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

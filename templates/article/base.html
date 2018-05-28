@@ -21,6 +21,13 @@
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="{% static 'js/pace.min.js' %}"></script>
     <script src="{% static 'js/modernizr.custom.js' %}"></script>
+    <!--Style-->
+    <style>
+        span.highlighted{
+            color: red;
+        }
+    </style>  
+           
 </head>
 
 <body>
@@ -52,8 +59,8 @@
                 <div id="header-search-box">
                     <a id="search-menu" href="#"><span id="search-icon" class="ion-ios-search-strong"></span></a>
                     <div id="search-form" class="search-form">
-                        <form role="search" method="get" id="searchform" action="#">
-                            <input type="search" placeholder="搜索" required>
+                        <form role="search" method="get" id="searchform" action="{% url 'haystack_search' %}">
+                            <input name="q" type="search" placeholder="搜索" required>
                             <button type="submit"><span class="ion-ios-search-strong"></span></button>
                         </form>
                     </div>
@@ -75,6 +82,11 @@
             <aside class="col-md-4">
                 {% block toc %}
                 {% endblock toc %}
+                <div class="rss">
+                  <a href="{% url 'rss' %}">
+                    <span class="icon-social-rss-outline">RSS 订阅</span>
+                  </a>
+               </div>
                 <div class="widget widget-recent-posts">
                     <h3 class="widget-title">最新文章</h3>
                      {% get_recent_posts as recent_post_list %}
@@ -108,15 +120,25 @@
                     <ul>
                         {% for category in category_list %}
                             <li>
-                                <a href="{% url 'article:category' category.pk %}">{{ category.name }} <span class="post-count">(13)</span></a>
+                                <a href="{% url 'article:category' category.pk %}">{{ category.name }} <span class="post-count">({{category.article_set.count}})</span></a>
                             </li>
                         {% empty %}
                             暂无分类！
                         {% endfor %}
                     </ul>
                 </div>
-                <div>
-                  
+                <div class="widget widget-tag-cloud">
+                    <h3 class="widget-title">标签云</h3>
+                    {% get_tags as tag_list %}
+                    <ul>
+                        {% for tag in tag_list %}
+                            <li>
+                                <a href="{% url 'article:tag' tag.pk %}">{{ tag.name }}</a>
+                            </li>
+                        {% empty %}
+                            暂无标签！
+                        {% endfor %}
+                    </ul>
                 </div>
             </aside>
         </div>

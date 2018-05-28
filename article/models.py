@@ -39,7 +39,7 @@ class Article(models.Model):
                'markdown.extensions.extra',
                'markdown.extensions.codehilite',
             ])
-            self.excerpt = strip_tags(md.convert(self.body))[:54]
+            self.excerpt = strip_tags(md.convert(self.content))[:54]
         super(Article,self).save(*args, **kwargs)
     
     def increase_views(self):

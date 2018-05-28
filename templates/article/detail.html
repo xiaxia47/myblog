@@ -11,7 +11,7 @@
                             <span class="post-date"><a href="#"><time class="entry-date"
                                                                       datetime="{{ post.pub_date }}">{{ post.pub_date}}</time></a></span>
                             <span class="post-author"><a href="#">{{ post.author }}</a></span>
-                            <span class="comments-link"><a href="#">{{ comment_list.count }} 评论</a></span>
+                            <span class="comments-link"><a href="#comment-list">{{ comment_list.count }} 评论</a></span>
                             <span class="views-count"><a href="#">{{ post.views }} 阅读</a></span>
                         </div>
                     </header>
@@ -44,7 +44,9 @@
                         </div>    <!-- row -->
                     </form>
                     <div class="comment-list-panel">
-                        <h3>评论列表，共 <span>{{comment_list.count}}</span> 条评论</h3>
+                       <a name="comment-list" > 
+                          <h3>评论列表，共 <span>{{comment_list.count}}</span> 条评论</h3>
+                       </a>
                         <ul class="comment-list list-unstyled">
                         {% for comment in comment_list %}
                             <li class="comment-item">
