@@ -12,7 +12,7 @@ class ArticleAdmin(admin.ModelAdmin):
         ('详细信息',{'fields':['author','excerpt','content'],'classes':['collapse']})
     ]
     list_filter= ['category','tag']
-    search_fields=['title','category','tag']
+    search_fields=['title','content','tag']
 
 
 @admin.register(Category)
