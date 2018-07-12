@@ -5,7 +5,7 @@ from elasticsearch_dsl import Document, Date, Nested, Boolean, \
 from elasticsearch_dsl.analysis import CustomAnalyzer as _CustomAnalyzer
 
 from elasticsearch_dsl.connections import connections
-from ..settings import ELSERVER_ADDR
+from settings import ELSERVER_ADDR
 connections.create_connection(hosts=[ELSERVER_ADDR])
 
 class CustomAnalyzer(_CustomAnalyzer):
@@ -36,4 +36,3 @@ class ArticleType(Document):
 
 if __name__ == '__main__':
     ArticleType.init()
-# Create your models here.
