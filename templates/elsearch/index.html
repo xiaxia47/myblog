@@ -78,17 +78,17 @@
    //搜索建议
    $(function(){
        $('.searchInput').bind(' input propertychange ',function(){
-           var searchText = $(this).val()
-           var tmpHtml = ""
+           var searchText = $(this).val();
+           var tmpHtml = "";
            $.ajax({
                cache: false,
                type: 'get',
-               dataType: 'json'
+               dataType: 'json',
                url:suggest_url+"?s=" + searchText+"&s_type="+$(".searchItem.current").attr('data-type'),
                async: true,
                success:function(data){
                    for (var i=0;i<data.length;i++){
-                       tmpHtml += '<li><a href="'+search_url+'?query='+data[i]+'">'+data[i]='</a></li>'
+                       tmpHtml += '<li><a href="'+search_url+'?query='+data[i]+'">'+data[i]+'</a></li>'
                    }
                    $(".dataList").html("")
                    $(".dataList").append(tmpHtml);
@@ -98,8 +98,8 @@
                        $('.dataList').show()
                    }
                }
-           } 
-       }
+           });
+       });
    })
 
    hideElement($('.dataList'), $('.searchInput'));
@@ -130,7 +130,7 @@
             MapSearchArr();
         }
         
-        window.location.href=search_url+'?query='+val'&s_type='+$('.searchItem.current').attr('data-type')
+        window.location.href=search_url+'?query='+val+'&s_type='+$('.searchItem.current').attr('data-type')
     }
     
     function MapSearchArr(){

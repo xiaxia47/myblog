@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'article.templatetags.custom_markdown',
     'article.apps.ArticleConfig',
     'comment.apps.CommentConfig',
+    'elsearch.apps.ElsearchConfig',
 ]
 
 MIDDLEWARE = [

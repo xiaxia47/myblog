@@ -6,10 +6,10 @@ from django.http import HttpResponse
 from elasticsearch import Elasticsearch
 from datetime import datetime
 import redis
-from settings import ELSERVER_ADDR
+from .settings import ELSERVER_ADDR,REDIS_SERVER,REDIS_PORT,REDIS_PASSWORD
 
 client = Elasticsearch(hosts=[ELSERVER_ADDR])
-redis_cli = redis.StrictRedis()
+redis_cli = redis.StrictRedis(host=REDIS_SERVER,port=REDIS_PORT,password=REDIS_PASSWORD)
 
 class IndexView(View):
     def get(self, request):
@@ -17,7 +17,7 @@ class IndexView(View):
         return render(request, "elsearch/index.html",{"topn_search": topn_search})
 
 
-class SearchSuggest(view):
+class SearchSuggest(View):
     def get(self, request):
         key_words = request.GET.get('s','')
         re_datas = []

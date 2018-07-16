@@ -1,11 +1,11 @@
 from django.db import models
 from datetime import datetime
-from elasticsearch_dsl import Document, Date, Nested, Boolean, \
-    analyzer, InnerObjectWrapper, Completion, Keyword, Text, Integer
+from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
+    analyzer, Completion, Keyword, Text, Integer
 from elasticsearch_dsl.analysis import CustomAnalyzer as _CustomAnalyzer
 
 from elasticsearch_dsl.connections import connections
-from settings import ELSERVER_ADDR
+from .settings import ELSERVER_ADDR
 connections.create_connection(hosts=[ELSERVER_ADDR])
 
 class CustomAnalyzer(_CustomAnalyzer):
@@ -15,7 +15,7 @@ class CustomAnalyzer(_CustomAnalyzer):
 
 ik_analyzer = CustomAnalyzer("ik_max_word", filter=["lowercase"])
 
-class ArticleType(Document):
+class ArticleType(DocType):
     #伯乐在线文章类型
     suggest = Completion(analyzer=ik_analyzer)
     title = Text(analyzer="ik_max_word")

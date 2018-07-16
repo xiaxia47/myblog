@@ -24,4 +24,5 @@ urlpatterns = [
     path('', include('article.urls')),
     path('', include('comment.urls')),
     path('all/rss/', AllArticlesRssFeed(), name='rss'),
+    path('', include('elsearch.urls')),
 ]
