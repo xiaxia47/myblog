@@ -1,36 +1,48 @@
 from django.shortcuts import render
 import json
 from django.views.generic.base import View
-from elsearch.models import ArticleType
 from django.http import HttpResponse
 from elasticsearch import Elasticsearch
 from datetime import datetime
 import redis
-from .settings import ELSERVER_ADDR,REDIS_SERVER,REDIS_PORT,REDIS_PASSWORD
+from .settings import *
 
-client = Elasticsearch(hosts=[ELSERVER_ADDR])
-redis_cli = redis.StrictRedis(host=REDIS_SERVER,port=REDIS_PORT,password=REDIS_PASSWORD)
+client = Elasticsearch(hosts=[{"host":ELSERVER_HOST,"port":ELSERVER_PORT}],)
+redis_cli = redis.StrictRedis(host=REDIS_SERVER, port=REDIS_PORT, password=REDIS_PASSWORD,decode_responses=True)
+from elsearch.models import ArticleType, QuestionType, JobType
+
+DEFAULT_DOCUMENT = 'article'
+DOCUMENT = {
+    'article': ArticleType,
+    'question': QuestionType,
+    'job': JobType,
+}
 
 class IndexView(View):
     def get(self, request):
-        topn_search = redis_cli.zrevrangebyscore("search_keywords_set", "+inf", "-inf", start=0,num=5)
-        return render(request, "elsearch/index.html",{"topn_search": topn_search})
+        topn_search = redis_cli.zrevrangebyscore("search_keywords_set", "+inf", "-inf", start=0, num=5)
+        print(topn_search)
+        return render(request, "elsearch/index.html", {"topn_search": topn_search})
 
 
 class SearchSuggest(View):
     def get(self, request):
         key_words = request.GET.get('s','')
+        key_type = request.GET.get('doc', DEFAULT_DOCUMENT)
+        try:
+            doc = DOCUMENT[key_type].search()
+        except KeyError:
+            doc = DOCUMENT[DEFAULT_DOCUMENT].search()
         re_datas = []
         if key_words:
-            s = ArticleType.search()
-            s = s.suggest('my_suggest', key_words, completion={
+            s = doc.suggest('my_suggest', key_words, completion={
                 "field":"suggest", "fuzzy":{
                     "fuzziness":2
                 },
                 "size": 10
             })
-            suggestions = s.execute_suggest()
-            for match in suggestions.my_suggest[0].options:
+            suggestions = s.execute()
+            for match in suggestions.suggest.my_suggest[0].options:
                 source = match._source
                 re_datas.append(source['title'])
         return HttpResponse(json.dumps(re_datas), content_type="application/json")
@@ -39,7 +51,7 @@ class SearchSuggest(View):
 class SearchView(View):
     def get(self, request):
         key_words = request.GET.get("query","")
-        s_type = request.GET.get("s_type", "article")
+        doc = request.GET.get("s_type", "article")
         redis_cli.zincrby("search_keywords_set", key_words)
         topn_search = redis_cli.zrevrangebyscore("search_keywords_set","+inf","-inf",start=0,num=5)
         page = request.GET.get("p","1")
@@ -50,7 +62,7 @@ class SearchView(View):
         jobbole_count = redis_cli.get("jobbole_count")
         start_time = datetime.now()
         response = client.search(
-            index= "jobbole",
+            index= doc,
             body={
                 "query":{
                     "multi_match":{
@@ -81,7 +93,7 @@ class SearchView(View):
         for hit in response["hits"]["hits"]:
             hit_dict = {}
             if "title" in hit["highlight"]:
-                hit_dict["title"] = "".join(hit["hightlight"]["title"])
+                hit_dict["title"] = "".join(hit["highlight"]["title"])
             else:
                 hit_dict["title"] = hit["_source"]["title"]
             if "content" in hit["highlight"]:
@@ -92,9 +104,10 @@ class SearchView(View):
             hit_dict["create_date"] = hit["_source"]["create_date"]
             hit_dict["url"] = hit["_source"]["url"]
             hit_dict["score"] = hit["_score"]
-            hit_list.append(hit_dict)
-        return render(request, "result.html", {"page":page,
-                                               "all_hits":hit_list,
+            hit_hist.append(hit_dict)
+        return render(request, "elsearch/result.html", {"page":page,
+                                               "doc":doc,
+                                               "all_hits":hit_hist,
                                                "key_words":key_words,
                                                "total_nums":total_nums,
                                                "page_nums":page_nums,

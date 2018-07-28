@@ -5,14 +5,14 @@
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>python-lcv-search搜索引擎</title>
+<title>极简搜索</title>
 <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
 <link href="{% static 'css/result.css' %}" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="container">
 	<div id="hd" class="ue-clear">
-    	<a href="/"><div class="logo"></div></a>
+    	<a href="{% url 'elsearch:index' %}"><div class="logo"></div></a>
         <div class="inputArea">
         	<input type="text" class="searchInput" value="{{ key_words }}"/>
             <input type="button" class="searchButton" onclick="add_search()"/>
@@ -20,38 +20,35 @@
     </div>
     <div class="nav">
     	<ul class="searchList">
-            <li class="searchItem current" data-type="article">文章</li>
-            <li class="searchItem" data-type="question">问答</li>
-            <li class="searchItem" data-type="job">职位</li>
+            <li class="searchItem {% if doc == "article" %}current{% endif %}" data-type="article">文章</li>
+            <li class="searchItem {% if doc == "question" %}current{% endif %}" data-type="question">问答</li>
+            <li class="searchItem {% if doc == "job" %}current{% endif %}" data-type="job">职位</li>
         </ul>
     </div>
 	<div id="bd" class="ue-clear">
         <div id="main">
         	<div class="sideBar">
-            	
                 <div class="subfield">网站</div>
                 <ul class="subfieldContext">
                 	<li>
-                    	<span class="name">伯乐在线</span>
-						<span class="unit">({{ jobbole_count }})</span>
+                    	<span class="name">文章</span>
+						<span class="unit">({{ article_count }})</span>
                     </li>
                     <li>
                     	<span class="name">知乎</span>
-						<span class="unit">(9862)</span>
+						<span class="unit">({{ question_count }})</span>
                     </li>
                     <li>
-                    	<span class="name">拉勾网</span>
-						<span class="unit">(9862)</span>
+                    	<span class="name">职位</span>
+						<span class="unit">({{ job_count }})</span>
                     </li>
-                    <li class="more">
+                    <!--<li class="more">
                     	<a href="javascript:;">
                         	<span class="text">更多</span>
                         	<i class="moreIcon"></i>
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
-                
-                            
                 <div class="sideBarShowHide">
                 	<a href="javascript:;" class="icon"></a>
                 </div>
@@ -65,7 +62,7 @@
                     <div class="resultItem">
                             <div class="itemHead">
                                 <a href="{{ hit.url }}"  target="_blank" class="title">{% autoescape off %}{{ hit.title }}{% endautoescape %}</a>
-                                <span class="divsion">-</span>
+                                <span class="division">-</span>
                                 <span class="fileType">
                                     <span class="label">来源：</span>
                                     <span class="value">伯乐在线</span>
@@ -85,7 +82,7 @@
                                 </span>
                                 <span class="info">
                                     <label>发布时间：</label>
-                                    <span class="value">2017-04-23</span>
+                                    <span class="value">{{ hit.create_date }}</span>
                                 </span>
                             </div>
                         </div>
@@ -94,9 +91,7 @@
                 <!-- 分页 -->
                 <div class="pagination ue-clear"></div>
                 <!-- 相关搜索 -->
-                
-                
-                
+
             </div>
             <div class="historyArea">
             	<div class="hotSearch">
@@ -118,9 +113,9 @@
     </div><!--End of bd-->
 </div>
 
-<div id="foot">Copyright &copy;projectsedu.com 版权所有  E-mail:admin@projectsedu.com</div>
+<div id="foot">Copyright &copy;fsdeep.com 版权所有  E-mail:admin@fsdeep.com</div>
 </body>
-<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/global.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/pagination.js' %}"></script>
 <script type="text/javascript">
@@ -170,7 +165,7 @@
 		}
         
     });
-	var key_words = "java"
+	var key_words = "{{ key_words }}"
 	//分页
 	$(".pagination").pagination({{ total_nums }}, {
 		current_page :{{ page|add:'-1' }}, //当前页码
@@ -179,7 +174,7 @@
 		callback :pageselectCallback
 	});
 	function pageselectCallback(page_id, jq) {
-		window.location.href=search_url+'?query='+key_words+'&p='+page_id
+		window.location.href=search_url+'?query='+key_words+'&p='+(page_id+1)+"&doc="+$(".searchItem.current").attr('data-type')
 	}
 	
 	setHeight();
@@ -213,7 +208,7 @@
 
     hideElement($('.dataList'), $('.searchInput'));
 </script>
-<script>
+<script type="text/javascript">
     var searchArr;
     //定义一个search的，判断浏览器有无数据存储（搜索历史）
     if(localStorage.search){
@@ -237,7 +232,7 @@
             MapSearchArr();
         }
 
-        window.location.href=search_url+'?query='+val+"&s_type="+$(".searchItem.current").attr('data-type')
+        window.location.href=search_url+'?query='+val+"&doc="+$(".searchItem.current").attr('data-type')
 
     }
 
@@ -250,7 +245,8 @@
             arrLen = searchArr.length
         }
         for (var i=0;i<arrLen;i++){
-            tmpHtml += '<li><a href="/search?query='+searchArr[i]+'">'+searchArr[i]+'</a></li>'
+            tmpHtml += '<li><a href="/search?query='+searchArr[i]+'&doc='+
+                $(".searchItem.current").attr("data-type")+'">'+searchArr[i]+'</a></li>'
         }
         $(".mySearch .historyList").append(tmpHtml);
     }

@@ -1,12 +1,9 @@
-from django.db import models
-from datetime import datetime
-from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
-    analyzer, Completion, Keyword, Text, Integer
+from elasticsearch_dsl import DocType, Date, Completion, Keyword, Text, Integer
 from elasticsearch_dsl.analysis import CustomAnalyzer as _CustomAnalyzer
-
 from elasticsearch_dsl.connections import connections
-from .settings import ELSERVER_ADDR
-connections.create_connection(hosts=[ELSERVER_ADDR])
+from .settings import ELSERVER_HOST, ELSERVER_PORT
+connections.create_connection(hosts=[ELSERVER_HOST], port=ELSERVER_PORT)
+
 
 class CustomAnalyzer(_CustomAnalyzer):
     def get_analysis_definition(self):
@@ -14,6 +11,7 @@ class CustomAnalyzer(_CustomAnalyzer):
 
 
 ik_analyzer = CustomAnalyzer("ik_max_word", filter=["lowercase"])
+
 
 class ArticleType(DocType):
     #伯乐在线文章类型
@@ -31,8 +29,17 @@ class ArticleType(DocType):
     content = Text(analyzer="ik_max_word")
 
     class Meta:
-         name = 'jobbole'
-         doc_type ="article"
+        name = 'jobbole'
+        doc_type = "article"
+
+
+class QuestionType(DocType):
+    pass
+
+
+class JobType(DocType):
+    pass
+
 
 if __name__ == '__main__':
     ArticleType.init()
