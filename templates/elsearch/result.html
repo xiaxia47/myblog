@@ -20,9 +20,9 @@
     </div>
     <div class="nav">
     	<ul class="searchList">
-            <li class="searchItem {% if doc == "article" %}current{% endif %}" data-type="article">文章</li>
-            <li class="searchItem {% if doc == "question" %}current{% endif %}" data-type="question">问答</li>
-            <li class="searchItem {% if doc == "job" %}current{% endif %}" data-type="job">职位</li>
+            <li class="searchItem {% if doc == "jobbole" %}current{% endif %}" data-type="jobbole">文章</li>
+            <li class="searchItem {% if doc == "zhihu" %}current{% endif %}" data-type="zhihu">问答</li>
+            <li class="searchItem {% if doc == "jobinfo" %}current{% endif %}" data-type="jobinfo">职位</li>
         </ul>
     </div>
 	<div id="bd" class="ue-clear">
@@ -32,15 +32,15 @@
                 <ul class="subfieldContext">
                 	<li>
                     	<span class="name">文章</span>
-						<span class="unit">({{ article_count }})</span>
+						<span class="unit">({{ cnt.jobbole }})</span>
                     </li>
                     <li>
                     	<span class="name">知乎</span>
-						<span class="unit">({{ question_count }})</span>
+						<span class="unit">({{ cnt.zhihu }})</span>
                     </li>
                     <li>
                     	<span class="name">职位</span>
-						<span class="unit">({{ job_count }})</span>
+						<span class="unit">({{ cnt.jobinfo }})</span>
                     </li>
                     <!--<li class="more">
                     	<a href="javascript:;">
@@ -65,7 +65,7 @@
                                 <span class="division">-</span>
                                 <span class="fileType">
                                     <span class="label">来源：</span>
-                                    <span class="value">伯乐在线</span>
+                                    <span class="value">{{ hit.source }}</span>
                                 </span>
                                 <span class="dependValue">
                                     <span class="label">得分：</span>
@@ -78,7 +78,7 @@
                             <div class="itemFoot">
                                 <span class="info">
                                     <label>网站：</label>
-                                    <span class="value">伯乐在线</span>
+                                    <span class="value">{{ hit.source }}</span>
                                 </span>
                                 <span class="info">
                                     <label>发布时间：</label>
@@ -207,6 +207,54 @@
     });
 
     hideElement($('.dataList'), $('.searchInput'));
+</script>
+<script type="text/javascript">
+    var suggest_url = "{% url 'elsearch:suggest' %}"
+    var search_url = "{% url 'elsearch:search' %}"
+
+    $('.searchList').on('click','.searchItem',function(){
+        $('.searchList .searchItem').removeClass('current');
+        $(this).addClass('current');
+    });
+
+    function removeByValue(arr, val){
+      for(var i=0; i<arr.length; i++){
+        if(arr[i] == val){
+          arr.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+   //搜索建议
+   $(function(){
+       $('.searchInput').bind(' input propertychange ',function(){
+           var searchText = $(this).val();
+           var tmpHtml = "";
+           $.ajax({
+               cache: false,
+               type: 'get',
+               dataType: 'json',
+               url:suggest_url+"?s=" + searchText+"&doc="+$(".searchItem.current").attr('data-type'),
+               async: true,
+               success:function(data){
+                   for (var i=0;i<data.length;i++){
+                       tmpHtml += '<li><a href="'+search_url+'?query='+data[i].slice(0,35)+'&doc='+$(".searchItem.current").attr('data-type')+'">'+data[i]+'</a></li>'
+                   }
+                   $(".dataList").html("")
+                   $(".dataList").append(tmpHtml);
+                   if (data.length ==0){
+                       $('.dataList').hide()
+                   }else {
+                       $('.dataList').show()
+                   }
+               }
+           });
+       });
+   })
+
+   hideElement($('.dataList'), $('.searchInput'));
+
 </script>
 <script type="text/javascript">
     var searchArr;
