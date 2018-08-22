@@ -73,6 +73,7 @@
     MapSearchArr();
    
     function add_search(){
+        var search_url = "{% url 'elsearch:search' %}"
         var val = $(".searchInput").val();
         if (val.length>=2){
             //点击搜索按钮时，去重
