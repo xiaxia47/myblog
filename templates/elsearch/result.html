@@ -53,6 +53,22 @@
                 	<a href="javascript:;" class="icon"></a>
                 </div>
             </div>
+            <div class="historyArea">
+            	<div class="hotSearch">
+                	<h6>热门搜索</h6>
+                    <ul class="historyList">
+                        {% for search_word in topn_search %}
+                            <li><a href="{% url 'elsearch:search' %}?query={{ search_word }}">{{ search_word }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="mySearch">
+                	<h6>我的搜索</h6>
+                    <ul class="historyList">
+
+                    </ul>
+                </div>
+            </div>
             <div class="resultArea">
             	<p class="resultTotal">
                 	<span class="info">找到约&nbsp;<span class="totalResult">{{ total_nums }}</span>&nbsp;条结果(用时<span class="time">{{ last_seconds }}</span>秒)，共约<span class="totalPage">{{ page_nums }}</span>页</span>
@@ -93,22 +109,7 @@
                 <!-- 相关搜索 -->
 
             </div>
-            <div class="historyArea">
-            	<div class="hotSearch">
-                	<h6>热门搜索</h6>
-                    <ul class="historyList">
-                        {% for search_word in topn_search %}
-                            <li><a href="{% url 'elsearch:search' %}?query={{ search_word }}">{{ search_word }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="mySearch">
-                	<h6>我的搜索</h6>
-                    <ul class="historyList">
 
-                    </ul>
-                </div>
-            </div>
         </div><!-- End of main -->
     </div><!--End of bd-->
 </div>

@@ -59,6 +59,63 @@
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="{% static 'js/global.js' %}"></script>
 <script type="text/javascript">
+    var searchArr;
+    //定义一个search的，判断浏览器有无搜索历史
+    if(localStorage.search){
+    //如果有，转换成数组的形式存放到searchArr的数据里(localStorage以字符串的形式存储，所有要
+    //把它转换成数组的形式)
+        searchArr= localStorage.search.split(",")
+    }else{
+    //如果没有，则定义searchArr为一个空的数组
+        searchArr = [];
+    }
+    //把存储的数据显示出来作为搜索历史
+    MapSearchArr();
+   
+    function add_search(){
+        var val = $(".searchInput").val();
+        if (val.length>=2){
+            //点击搜索按钮时，去重
+            KillRepeat(val);
+            //去重后把数组存储到浏览器localStorage
+            localStorage.search = searchArr;
+            //然后再把搜索内容显示出来
+            MapSearchArr();
+        }
+        window.location.href=search_url+'?query='+val+'&doc='+$('.searchItem.current').attr('data-type')
+    }
+    
+    function MapSearchArr(){
+        var tmpHtml = "";
+        var arrlen = 0;
+        if (searchArr.length >=5){
+            arrLen = 5
+        }else {
+            arrLen = searchArr.length
+        }
+        for (var i=0;i<arrLen;i++){
+            tmpHtml += '<a href="'+search_url+'?query='+searchArr[i]+'&doc='+ $(".searchItem.current").attr('data-type')+'">'+searchArr[i]+'</a>'
+        }
+        $(".mysearch .all-search").html(tmpHtml);
+    }
+    //去重
+    function KillRepeat(val){
+        var kill=0;
+        for (var i=0;i<searchArr.length;i++){
+            if(val==searchArr[i]){
+                kill ++
+            }
+        }
+        if(kill<1){
+            searchArr.unshift(val);
+        }else {
+            removeByValue(searchArr, val)
+            searchArr.unshift(val)
+        }
+    }
+
+</script>
+<script type="text/javascript">
     var suggest_url = "{% url 'elsearch:suggest' %}"
     var search_url = "{% url 'elsearch:search' %}"
 
@@ -66,7 +123,7 @@
         $('.searchList .searchItem').removeClass('current');
         $(this).addClass('current');
     });
-   
+
     function removeByValue(arr, val){
       for(var i=0; i<arr.length; i++){
         if(arr[i] == val){
@@ -75,7 +132,7 @@
         }
       }
     }
-      
+
    //搜索建议
    $(function(){
        $('.searchInput').bind(' input propertychange ',function(){
@@ -104,64 +161,7 @@
    })
 
    hideElement($('.dataList'), $('.searchInput'));
-   
-</script>
-<script>
-    var searchArr;
-    //定义一个search的，判断浏览器有无搜索历史
-    if(localStorage.search){
-    //如果有，转换成数组的形式存放到searchArr的数据里(localStorage以字符串的形式存储，所有要
-    //把它转换成数组的形式)
-        searchArr= localStorage.search.split(",")
-    }else{
-    //如果没有，则定义searchArr为一个空的数组
-        searchArr = [];
-    }
-    //把存储的数据显示出来作为搜索历史
-    MapSearchArr();
-   
-    function add_search(){
-        var val = $(".searchInput").val();
-        if (val.length>=2){
-            //点击搜索按钮时，去重
-            killRepeat(val);
-            //去重后把数组存储到浏览器localStorage
-            localStorage.search = searchArr;
-            //然后再把搜索内容显示出来
-            MapSearchArr();
-        }
-        
-        window.location.href=search_url+'?query='+val+'&doc='+$('.searchItem.current').attr('data-type')
-    }
-    
-    function MapSearchArr(){
-        var tmpHtml = "";
-        var arrlen = 0;searchList
-        if (searchArr.length >=5){
-            arrLen = 5
-        }else {
-            arrLen = searchArr.length
-        }
-        for (var i=0;i<arrLen;i++){
-            tmpHtml += '<a href="'+search_url+'?query='+searchArr[i]+'&doc='+ $(".searchItem.current").attr('data-type')+'">'+searchArr[i]+'</a>'
-        }
-        $(".mysearch .all-search").html(tmpHtml);
-    }
-    //去重
-    function KillRepeat(val){
-        var kill=0;
-        for (var i=0;i<searchArr.length;i++){
-            if(val==searchArr[i]){
-                kill ++
-            }
-        }
-        if(kill<1){
-            searchArr.unshift(val);
-        }else {
-            removeByValue(searchArr, val)
-            searchArr.unshift(val)
-        }
-    }
 
 </script>
+
 </html>
