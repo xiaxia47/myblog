@@ -6,16 +6,17 @@ from elasticsearch import Elasticsearch
 from datetime import datetime
 import redis
 from .settings import *
+from elasticsearch.exceptions import ConnectionTimeout
 
 client = Elasticsearch(hosts=[{"host":ELSERVER_HOST,"port":ELSERVER_PORT}],)
 redis_cli = redis.StrictRedis(host=REDIS_SERVER, port=REDIS_PORT, password=REDIS_PASSWORD,decode_responses=True)
 from elsearch.models import ArticleType, QuestionType, JobType
 
-DEFAULT_DOCUMENT = 'article'
+DEFAULT_DOCUMENT = 'jobbole'
 DOCUMENT = {
-    'article': ArticleType,
-    'question': QuestionType,
-    'job': JobType,
+    'jobbole': ArticleType,
+    'zhihu': QuestionType,
+    'jobinfo': JobType,
 }
 
 class IndexView(View):
@@ -34,24 +35,29 @@ class SearchSuggest(View):
         except KeyError:
             doc = DOCUMENT[DEFAULT_DOCUMENT].search()
         re_datas = []
-        if key_words:
-            s = doc.suggest('my_suggest', key_words, completion={
-                "field":"suggest", "fuzzy":{
-                    "fuzziness":2
-                },
-                "size": 10
-            })
-            suggestions = s.execute()
-            for match in suggestions.suggest.my_suggest[0].options:
-                source = match._source
-                re_datas.append(source['title'])
+        try:
+            if key_words:
+                s = doc.suggest('my_suggest', key_words, completion={
+                    "field":"suggest",
+                    "fuzzy":{
+                        "fuzziness":2
+                    },
+                    "size": 5
+                })
+                suggestions = s.execute()
+                for match in suggestions.suggest.my_suggest[0].options:
+                    source = match._source
+                    re_datas.append(str(source['title']))
+        except ConnectionTimeout as e:
+            print(e)
+
         return HttpResponse(json.dumps(re_datas), content_type="application/json")
 
 
 class SearchView(View):
     def get(self, request):
         key_words = request.GET.get("query","")
-        doc = request.GET.get("s_type", "article")
+        index = request.GET.get("doc", "jobbole")
         redis_cli.zincrby("search_keywords_set", key_words)
         topn_search = redis_cli.zrevrangebyscore("search_keywords_set","+inf","-inf",start=0,num=5)
         page = request.GET.get("p","1")
@@ -59,10 +65,13 @@ class SearchView(View):
             page = int(page)
         except:
             page = 1
-        jobbole_count = redis_cli.get("jobbole_count")
+        cnt = {}
+        cnt["jobbole"] = redis_cli.get("jobbole_cnt")
+        cnt["zhihu"] = redis_cli.get("zhihu_cnt")
+        cnt["jobinfo"]= redis_cli.get("jobinfo_cnt")
         start_time = datetime.now()
         response = client.search(
-            index= doc,
+            index=index,
             body={
                 "query":{
                     "multi_match":{
@@ -76,7 +85,7 @@ class SearchView(View):
                     "pre_tags":['<span class="keyWord">'],
                     "post_tags":['</span>'],
                     "fields":{
-                        "title": {},
+                        "title":{},
                         "content":{},
                     }
                 }
@@ -103,14 +112,15 @@ class SearchView(View):
 
             hit_dict["create_date"] = hit["_source"]["create_date"]
             hit_dict["url"] = hit["_source"]["url"]
+            hit_dict["source"] = hit["_source"]["source"]
             hit_dict["score"] = hit["_score"]
             hit_hist.append(hit_dict)
         return render(request, "elsearch/result.html", {"page":page,
-                                               "doc":doc,
+                                               "doc":index,
                                                "all_hits":hit_hist,
                                                "key_words":key_words,
                                                "total_nums":total_nums,
                                                "page_nums":page_nums,
                                                "last_seconds":last_seconds,
-                                               "jobbole_count":jobbole_count,
+                                               "cnt":cnt,
                                                "topn_search":topn_search})

@@ -17,9 +17,9 @@
             </h1>
             <div class="nav ue-clear">
                 <ul class="searchList">
-                    <li class="searchItem current" data-type="article">文章</li>
-                    <li class="searchItem" data-type="question">知乎</li>
-                    <li class="searchItem" data-type="job">职位<li>
+                    <li class="searchItem {% if doc == "jobbole" or doc is None %}current{% endif %}" data-type="jobbole">文章</li>
+                    <li class="searchItem {% if doc == "zhihu" %}current{% endif %}" data-type="zhihu">问答</li>
+                    <li class="searchItem {% if doc == "jobinfo" %}current{% endif %}" data-type="jobinfo">职位</li>
                </ul>
             </div>
             <div class="inputArea">
@@ -136,7 +136,7 @@
     
     function MapSearchArr(){
         var tmpHtml = "";
-        var arrlen = 0;
+        var arrlen = 0;searchList
         if (searchArr.length >=5){
             arrLen = 5
         }else {

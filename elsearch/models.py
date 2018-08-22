@@ -34,12 +34,39 @@ class ArticleType(DocType):
 
 
 class QuestionType(DocType):
-    pass
+    suggest = Completion(analyzer=ik_analyzer)
+    title = Text(analyzer="ik_max_word")
+    create_date = Date()
+    url = Keyword()
+    url_object_id = Keyword()
+    tags = Text(analyzer="ik_max_word")
+    content = Text(analyzer="ik_max_word")
+
+    class Meta:
+        index = "zhihu"
+        doc_type = "question"
 
 
 class JobType(DocType):
-    pass
+    suggest = Completion(analyzer=ik_analyzer)
+    title = Text(analyzer="ik_max_word")
+    create_date = Date()
+    url = Keyword()
+    url_object_id = Keyword()
+    job_type = Text(analyzer="ik_max_word")
+    job_city = Keyword()
+    job_desc = Text(analyzer="ik_max_word")
+    company_name = Text(analyzer="ik_max_word")
+    tags = Text(analyzer="ik_max_word")
+    job_advantage = Text(analyzer="ik_max_word")
+    job_addr = Text(analyzer=ik_analyzer)
+
+    class Meta:
+        index = "jobinfo"
+        doc_type = "job"
 
 
 if __name__ == '__main__':
     ArticleType.init()
+    QuestionType.init()
+    JobType.init()

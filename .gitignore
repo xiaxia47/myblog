@@ -134,3 +134,4 @@ ENV/
 
 # mypy
 .mypy_cache/
+/elsearch/settings.py
