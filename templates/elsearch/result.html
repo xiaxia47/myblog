@@ -16,6 +16,9 @@
         <div class="inputArea">
         	<input type="text" class="searchInput" value="{{ key_words }}"/>
             <input type="button" class="searchButton" onclick="add_search()"/>
+            <ul class="dataList">
+                <li></li>
+            </ul>
         </div>
     </div>
     <div class="nav">
@@ -117,7 +120,6 @@
 <div id="foot">Copyright &copy;fsdeep.com 版权所有  E-mail:admin@fsdeep.com</div>
 </body>
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" src="{% static 'js/global.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/pagination.js' %}"></script>
 <script type="text/javascript">
     var search_url = "{% url 'elsearch:search' %}"
@@ -153,7 +155,6 @@
 			$(this).parent('.subfieldContext').find('.more').addClass('show').find('.text').text('收起');
 			$(this).parent('.subfieldContext').find('li:gt(2)').show();	
 		}
-		
 	});
 	
 	$('.sideBarShowHide a').click(function(e) {
@@ -164,9 +165,9 @@
 			$('#main').addClass('sideBarHide');	
 			$('#container').addClass('sideBarHide');
 		}
-        
     });
 	var key_words = "{{ key_words }}"
+
 	//分页
 	$(".pagination").pagination({{ total_nums }}, {
 		current_page :{{ page|add:'-1' }}, //当前页码
@@ -177,7 +178,6 @@
 	function pageselectCallback(page_id, jq) {
 		window.location.href=search_url+'?query='+key_words+'&p='+(page_id+1)+"&doc="+$(".searchItem.current").attr('data-type')
 	}
-	
 	setHeight();
 	$(window).resize(function(){
 		setHeight();	
@@ -207,7 +207,7 @@
         $('.dataList').hide()
     });
 
-    hideElement($('.dataList'), $('.searchInput'));
+    //hideElement($('.dataList'), $('.searchInput'));
 </script>
 <script type="text/javascript">
     var suggest_url = "{% url 'elsearch:suggest' %}"
@@ -253,9 +253,6 @@
            });
        });
    })
-
-   hideElement($('.dataList'), $('.searchInput'));
-
 </script>
 <script type="text/javascript">
     var searchArr;

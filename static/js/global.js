@@ -11,16 +11,17 @@ function hideElement(currentElement, targetElement) {
 	if (!$.isArray(targetElement)) {
 		targetElement = [ targetElement ];
 	}
+
 	$(document).on("click.hideElement", function(e) {
 		var len = 0, $target = $(e.target);
 		for (var i = 0, length = targetElement.length; i < length; i++) {
 			$.each(targetElement[i], function(j, n) {
-				if ($target.is($(n)) || $.contains($(n)[0], $target[0])) {
+				if ($target.is($(n)) || $.contains([$(n)[0],$target[0]])) {
 					len++;
 				}
 			});
 		}
-		if ($.contains(currentElement[0], $target[0])) {
+		if ($.contains(currentElement, $target[0])) {
 			len = 1;
 		}
 		if (len == 0) {
