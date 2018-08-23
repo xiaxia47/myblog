@@ -7,10 +7,11 @@ from datetime import datetime
 import redis
 from .settings import *
 from elasticsearch.exceptions import ConnectionTimeout
-
+from elasticsearch_dsl import Search
+from elsearch.models import ArticleType, QuestionType, JobType
 client = Elasticsearch(hosts=[{"host":ELSERVER_HOST,"port":ELSERVER_PORT}],)
 redis_cli = redis.StrictRedis(host=REDIS_SERVER, port=REDIS_PORT, password=REDIS_PASSWORD,decode_responses=True)
-from elsearch.models import ArticleType, QuestionType, JobType
+
 
 DEFAULT_DOCUMENT = 'jobbole'
 DOCUMENT = {
@@ -31,19 +32,19 @@ class SearchSuggest(View):
         key_words = request.GET.get('s','')
         key_type = request.GET.get('doc', DEFAULT_DOCUMENT)
         try:
-            doc = DOCUMENT[key_type].search()
+            doc = Search(index=key_type)
         except KeyError:
-            doc = DOCUMENT[DEFAULT_DOCUMENT].search()
+            doc = Search(index=DEFAULT_DOCUMENT)
         re_datas = []
         try:
             if key_words:
-                s = doc.suggest('my_suggest', key_words, completion={
-                    "field":"suggest",
-                    "fuzzy":{
-                        "fuzziness":2
-                    },
-                    "size": 5
-                })
+                s = doc.suggest('my_suggest', key_words,
+                               completion={
+                                   "field":"suggest",
+                                   "fuzzy":{
+                                       "fuzziness":2
+                                   },
+                                   "size": 5})
                 suggestions = s.execute()
                 for match in suggestions.suggest.my_suggest[0].options:
                     source = match._source
