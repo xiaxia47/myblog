@@ -34,7 +34,8 @@
                <p class="history">
                    <label>热门搜索:</label>
                    {% for search_word in topn_search %}
-                       <a href="{% url 'elsearch:search' %}?query={{ search_word }}">{{ search_word }}</a>
+                       <a href="{% url 'elsearch:search' %}?query={{ search_word.0 }}&doc={{ search_word.1 }}">
+                           {{ search_word.0 }}</a>
                    {% endfor %}
                </p>
                <p class="history mysearch">
@@ -59,6 +60,7 @@
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
     var searchArr;
+    var search_url = "{% url 'elsearch:search' %}";
     //定义一个search的，判断浏览器有无搜索历史
     if(localStorage.search){
     //如果有，转换成数组的形式存放到searchArr的数据里(localStorage以字符串的形式存储，所有要
@@ -72,7 +74,6 @@
     MapSearchArr();
    
     function add_search(){
-        var search_url = "{% url 'elsearch:search' %}"
         var val = $(".searchInput").val();
         if (val.length>=2){
             //点击搜索按钮时，去重
@@ -88,7 +89,7 @@
     function MapSearchArr(){
         var tmpHtml = "";
         var arrlen = 0;
-        var search_url = "{% url 'elsearch:search' %}";
+
         if (searchArr.length >=5){
             arrLen = 5
         }else {
