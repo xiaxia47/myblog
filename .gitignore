@@ -135,3 +135,5 @@ ENV/
 # mypy
 .mypy_cache/
 /elsearch/settings.py
+/.idea/workspace.xml
+/.idea
