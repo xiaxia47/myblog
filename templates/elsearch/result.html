@@ -61,7 +61,7 @@
                 	<h6>热门搜索</h6>
                     <ul class="historyList">
                         {% for search_word in topn_search %}
-                            <li><a href="{% url 'elsearch:search' %}?query={{ search_word }}">{{ search_word }}</a></li>
+                            <li><a href="{% url 'elsearch:search' %}?query={{ search_word.0 }}&doc={{ search_word.1 }}">{{ search_word.0 }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -256,6 +256,7 @@
 </script>
 <script type="text/javascript">
     var searchArr;
+    var search_url = "{% url 'elsearch:search' %}";
     //定义一个search的，判断浏览器有无数据存储（搜索历史）
     if(localStorage.search){
         //如果有，转换成 数组的形式存放到searchArr的数组里（localStorage以字符串的形式存储，所以要把它转换成数组的形式）
@@ -291,7 +292,7 @@
             arrLen = searchArr.length
         }
         for (var i=0;i<arrLen;i++){
-            tmpHtml += '<li><a href="{% url 'elsearch:search %} ?query='+searchArr[i]+'&doc='+
+            tmpHtml += '<li><a href="'+ search_url + '?query='+searchArr[i]+'&doc='+
                 $(".searchItem.current").attr("data-type")+'">'+searchArr[i]+'</a></li>'
         }
         $(".mySearch .historyList").append(tmpHtml);

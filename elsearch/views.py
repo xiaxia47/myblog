@@ -8,22 +8,18 @@ import redis
 from .settings import *
 from elasticsearch.exceptions import ConnectionTimeout
 from elasticsearch_dsl import Search
-from elsearch.models import ArticleType, QuestionType, JobType
 client = Elasticsearch(hosts=[{"host":ELSERVER_HOST,"port":ELSERVER_PORT}],)
 redis_cli = redis.StrictRedis(host=REDIS_SERVER, port=REDIS_PORT, password=REDIS_PASSWORD,decode_responses=True)
 
 
 DEFAULT_DOCUMENT = 'jobbole'
-DOCUMENT = {
-    'jobbole': ArticleType,
-    'zhihu': QuestionType,
-    'jobinfo': JobType,
-}
+
+
 
 class IndexView(View):
     def get(self, request):
         topn_search = redis_cli.zrevrangebyscore("search_keywords_set", "+inf", "-inf", start=0, num=5)
-        print(topn_search)
+        topn_search = [content.split('-') for content in topn_search]
         return render(request, "elsearch/index.html", {"topn_search": topn_search})
 
 
@@ -57,11 +53,13 @@ class SearchSuggest(View):
 
 class SearchView(View):
     def get(self, request):
-        key_words = request.GET.get("query","")
-        index = request.GET.get("doc", "jobbole")
-        redis_cli.zincrby("search_keywords_set", key_words)
+        key_word = request.GET.get("query","")
+        index = request.GET.get("doc", DEFAULT_DOCUMENT)
+        key_comb = '-'.join([key_word, index])
+        redis_cli.zincrby("search_keywords_set",key_comb)
         topn_search = redis_cli.zrevrangebyscore("search_keywords_set","+inf","-inf",start=0,num=5)
-        page = request.GET.get("p","1")
+        topn_search = [content.split('-') for content in topn_search]
+        page = request.GET.get("p", "1")
         try:
             page = int(page)
         except:
@@ -76,7 +74,7 @@ class SearchView(View):
             body={
                 "query":{
                     "multi_match":{
-                        "query":key_words,
+                        "query":key_word,
                         "fields":["tages","title","content"]
                     }
                 },
@@ -119,7 +117,7 @@ class SearchView(View):
         return render(request, "elsearch/result.html", {"page":page,
                                                "doc":index,
                                                "all_hits":hit_hist,
-                                               "key_words":key_words,
+                                               "key_words":key_word,
                                                "total_nums":total_nums,
                                                "page_nums":page_nums,
                                                "last_seconds":last_seconds,
