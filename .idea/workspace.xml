@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5e824922-7b5c-4fd8-97d9-cc0bd7077e18" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/elsearch/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/elsearch/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/global.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/global.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/elsearch/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/elsearch/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/elsearch/result.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/elsearch/result.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -44,8 +40,8 @@
       <file leaf-file-name="result.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/templates/elsearch/result.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="122" column="50" selection-start-line="122" selection-start-column="50" selection-end-line="122" selection-end-column="50" />
+            <state relative-caret-position="123">
+              <caret line="290" column="37" lean-forward="true" selection-start-line="290" selection-start-column="37" selection-end-line="290" selection-end-column="37" />
             </state>
           </provider>
         </entry>
@@ -132,7 +128,7 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-45" />
     <option name="y" value="10" />
     <option name="width" value="1940" />
@@ -639,8 +635,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/elsearch/result.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="122" column="50" selection-start-line="122" selection-start-column="50" selection-end-line="122" selection-end-column="50" />
+        <state relative-caret-position="123">
+          <caret line="290" column="37" lean-forward="true" selection-start-line="290" selection-start-column="37" selection-end-line="290" selection-end-column="37" />
         </state>
       </provider>
     </entry>
